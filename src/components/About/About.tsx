@@ -113,7 +113,7 @@ function About() {
                         fontSize={"lg"}
                         textAlign={{ base: "center", md: "left" }}
                     >
-                        In a galaxy where the bears' home planet is ravaged by raging wildfires, Berry the Bear urgently needs your help. By minting a bear, you can join the quest to save their world from the destruction caused by wildfires
+                        In a galaxy where the bears&apos; home planet is ravaged by raging wildfires, Berry the Bear urgently needs your help. By minting a bear, you can join the quest to save their world from the destruction caused by wildfires
                     </Text>
                 </Flex>
 
