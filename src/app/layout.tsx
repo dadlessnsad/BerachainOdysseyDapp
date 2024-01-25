@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
-
-const inter = Inter({ subsets: ['latin'] })
+import { Providers } from './providers'
+import { Header, PageLayout } from '@/components'
+import { Web3Modal } from '@/context'
+import styles from './page.module.css'
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -16,7 +18,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={styles.background}>
+        <Providers>
+          <Web3Modal>
+          <PageLayout>
+            {children}
+          </PageLayout>
+          </Web3Modal>
+        </Providers>
+      </body>
     </html>
   )
 }

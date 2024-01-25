@@ -1,0 +1,11 @@
+'use client'
+import { ChakraProvider, Flex } from '@chakra-ui/react'
+import theme from '@theme/index'
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ChakraProvider theme={theme}>
+        {children}
+    </ChakraProvider>
+  )
+}
