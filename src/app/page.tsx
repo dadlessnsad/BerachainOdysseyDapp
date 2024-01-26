@@ -4,16 +4,15 @@ import { About, Header, MintModal } from '@/components'
 import { use } from 'react';
 import { useAccount, useContractWrite } from 'wagmi';
 import { useWeb3Modal } from '@web3modal/wagmi/react';
+import { useHasMinted } from '@/hooks/useHasMinted';
 
 export default function Home() {
     const { isOpen, onOpen, onClose } = useDisclosure()
     const { open } = useWeb3Modal()
     const { address } = useAccount();
-    // const { data, isLoading, isSuccess, write } = useContractWrite({
-    //     address: '0xecb504d39723b0be0e3a9aa33d646642d1051ee1',
-    //     abi: wagmigotchiABI,
-    //     functionName: 'feed',
-    // })
+    const { hasMinted } = useHasMinted(address ? address : "0x")
+
+    console.log("Has Minted from page.tsx: ", hasMinted)
 
     const scollUpIcon = createIcon({
         displayName: "ScrollUpIcon",
@@ -108,6 +107,7 @@ export default function Home() {
                         px={"32px"}
                         mt={"32px"}
                         w={"66%"}
+                        isDisabled={hasMinted}
                         color={"brand.secondary_text"}
                         _hover={{
                             background: "brand.secondary_text",
@@ -125,7 +125,7 @@ export default function Home() {
                             fontFamily={"poppins"}
                             fontWeight={"500"}
                         >
-                            {address ? "Mint Your Bera" : "Connect Wallet"}
+                            {hasMinted ? "Address Already Minted" : address ? "Mint Your Bera" : "Connect Wallet"}
                         </Text>
                     </Button>
                 </Flex>

@@ -1,12 +1,13 @@
 "use client";
 import React from "react";
 import Link from "next/link";
-import { Image, HStack, Flex, Heading, Spacer, keyframes, useDisclosure, Button, Text, Icon } from "@chakra-ui/react";
+import { Image, HStack, Flex, Heading, Spacer, keyframes, useDisclosure, Button, Text, Icon, } from "@chakra-ui/react";
 import { BsWallet2 } from "react-icons/bs";
+import { GiHamburgerMenu } from "react-icons/gi";
 import { useWeb3Modal } from '@web3modal/wagmi/react'
 import { useAccount, useChainId, useBalance, useNetwork, useSwitchNetwork } from "wagmi";
-import { Web3Providers } from "@/context";
-
+import { MobileMenu } from "..";
+import { useHasMinted } from "@/hooks/useHasMinted";
 
 function Header() {
     const { isOpen, onOpen, onClose } = useDisclosure()
@@ -15,7 +16,7 @@ function Header() {
     const chainId: any = useChainId()
     const { chain } = useNetwork()
     const { chains: error, isLoading, pendingChainId, switchNetwork } = useSwitchNetwork()
-
+    const { hasMinted } = useHasMinted(address ? address : "0x")
 
     const wiggleAnimation = keyframes`
         0% { transform: rotate(0deg); }
@@ -28,16 +29,6 @@ function Header() {
         100% { transform: rotate(0deg); }
     `;
 
-    const hoverAnimation = {
-        transition: "all 1.4s ease-in-out",
-        _onHover: {
-            transform: "scale(1.05)",
-            animation: `${wiggleAnimation} 1.5s cubic-bezier(0.0, 0.0, 0.0, 0.0) both`,
-        },
-        background: "brand.primary_pink",
-        color: "brand.primary_text",
-    };
-
     React.useEffect(() => {
         if (chainId && chainId !== chain?.id) {
             if (switchNetwork) {
@@ -46,25 +37,18 @@ function Header() {
         }
     }, [chainId, chain, switchNetwork]);
     
-    // create a system to blur header background when the page is not at the bottom (because only scroll up is possible)
     const [isScrolled, setIsScrolled] = React.useState(false);
 
     React.useEffect(() => {
         const handleScroll = () => {
-            // Check if the page is scrolled (you can adjust the value '20' based on your needs)
-            const isScrolled = window.scrollY > 20;
+            const isScrolled = window.scrollY > 0;
             setIsScrolled(isScrolled);
         };
-
-        // Add event listener
         window.addEventListener("scroll", handleScroll);
-
-        // Remove event listener on cleanup
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
     const headerStyle = {
-
         backdropFilter: isScrolled ? "blur(10px)" : "none",
         transition: "backdrop-filter 0.1s ease-in-out"
     };
@@ -74,11 +58,11 @@ function Header() {
         <Flex
             as="header"
             align="center"
-            justifyContent={"center"}
+            justifyContent={"space-evenly"}
             direction="row"
             w="100vw"
             minHeight="10vh"
-            px={"128px"}
+            px={{ base: "32px", md: "128px" }}
             position="fixed"
             bottom="0"
             {...headerStyle}
@@ -91,26 +75,29 @@ function Header() {
                 w="100%"
             >
                 <Link href="/#mint">
-                <Heading
-                    as="h1"
-                    size="lg"
-                    fontFamily={"winds"}
-                    color={"brand.primary_pink"}
-                    isTruncated
-                >
-                    Berachain Odyssey
-                </Heading>
+                    <Heading
+                        as="h1"
+                        size={{ base: "md", md: "lg" }}
+                        fontFamily={"winds"}
+                        color={"brand.primary_pink"}
+                        isTruncated
+                    >
+                        Berachain Odyssey
+                    </Heading>
                 </Link>
             </HStack>
+
             <Spacer />
+
             <HStack
+                display={{ base: "none", md: "flex" }}
                 position="relative"
                 align="flex-start"
                 justify="center"
                 direction="row"
                 w="100%"
             >
-                <Link href="#about">
+                <Link href="/#about">
                     <Text
                         color={"brand.primary_text"}
                         fontFamily={"poppins"}
@@ -120,7 +107,7 @@ function Header() {
                     </Text>
                 </Link>
 
-                <Link href="#mint">
+                <Link href="/#mint">
                     <Text
                         color={"brand.primary_text"}
                         fontFamily={"poppins"}
@@ -130,9 +117,22 @@ function Header() {
                     </Text>
                 </Link>
 
+                {hasMinted && (<Link href="/billythebera">
+                    <Text
+                        color={"brand.primary_text"}
+                        fontFamily={"poppins"}
+                        fontWeight={"500"}
+                    >
+                        View Bera
+                    </Text>
+                </Link>)}
+
             </HStack>
+
             <Spacer />
+
             <HStack
+                display={{ base: "none", md: "flex" }}
                 position="relative"
                 align="center"
                 justify="flex-end"
@@ -155,7 +155,7 @@ function Header() {
                             color: "brand.secondary_text",
                         }}
                         onClick={() => open()}
-                        isLoading={isConnecting || isLoading || isOpen }
+                        isLoading={isConnecting || isLoading }
                         rightIcon={<Icon as={BsWallet2} />}
                     >
                         Connect Wallet
@@ -171,7 +171,7 @@ function Header() {
                         color={"brand.primary_text"}
                         _hover={{
                             transform: "scale(1.05)",
-                            animation: `${isOpen ? "" : wiggleAnimation} 1.5s cubic-bezier(0.0, 0.0, 0.0, 0.0) both}`,
+                            animation: `${wiggleAnimation} 1.5s cubic-bezier(0.0, 0.0, 0.0, 0.0) both`,
                             transition: "all 1.4s ease-in-out",
                             background: "brand.primary_pink",
                             color: "brand.secondary_text",
@@ -183,8 +183,29 @@ function Header() {
                         {address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connect Wallet'}
                     </Button>
                 )}
+
+                <Image
+                    position={"absolute"}
+                    right={"-96px"}
+                    maxH={"76px"}
+                    maxW={"76px"}
+                    src={"/BeraChainFaucet.png"}
+                    alt={"faucet"}
+                    cursor={"pointer"}
+                    onClick={() => window.open("https://artio.faucet.berachain.com/", "_blank")}
+                />
             </HStack>
 
+            <Icon 
+                as={GiHamburgerMenu}
+                display={{ base: "flex", md: "none" }}
+                w={8}
+                h={8}
+                color={"brand.primary_pink"}
+                onClick={onOpen}
+            />
+
+            <MobileMenu isOpen={isOpen} onClose={onClose} open={open} isDisconnected={isDisconnected} />
         </Flex>
 
     )
